@@ -14,9 +14,9 @@ urlpatterns = [
     path('', include('rest_auth.urls')),
     path('registration/', include('rest_auth.registration.urls')),
 
-    path('rest-auth/password-update/', ChangePasswordView.as_view()),
+    path('password-update/', ChangePasswordView.as_view()),
 
-    path('rest-auth/request-resent-email/', RequestPasswordResetEmail.as_view(), name='request-reset-email'),
-    path('rest-auth/password_reset/<uidb64>/<token>/', PasswordTokenCheckAPI.as_view(), name='reset_password_confirm'),
-    path('rest-auth/password-reset-complete/', SetNewPasswordAPIView.as_view(), name='password-reset-complete'),
+    path('request-resent-email/', RequestPasswordResetEmail.as_view(), name='request-reset-email'),
+    path('password_reset/<uidb64>/<token>/', PasswordTokenCheckAPI.as_view(), name='reset_password_confirm'),
+    path('password-reset-complete/', SetNewPasswordAPIView.as_view(), name='password-reset-complete'),
 ]
