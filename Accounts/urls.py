@@ -11,8 +11,8 @@ urlpatterns = [
     path('', CustomRegisterView.as_view()),
 
     path('api-auth/', include('rest_framework.urls')),
-    path('rest-auth/', include('rest_auth.urls')),
-    path('rest-auth/registration/', include('rest_auth.registration.urls')),
+    path('', include('rest_auth.urls')),
+    path('registration/', include('rest_auth.registration.urls')),
 
     path('rest-auth/password-update/', ChangePasswordView.as_view()),
 
