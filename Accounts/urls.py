@@ -10,11 +10,11 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('', CustomRegisterView.as_view()),
 
-    path('api-auth/', include('rest_framework.urls')),
-    path('', include('rest_auth.urls')),
-    path('registration/', include('rest_auth.registration.urls')),
+    path('registration/', RegisterView.as_view(), name='registration'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 
-    path('password-update/', ChangePasswordView.as_view()),
+    path('password-update/', ChangePasswordView.as_view(), name='password-update'),
 
     path('request-resent-email/', RequestPasswordResetEmail.as_view(), name='request-reset-email'),
     path('password_reset/<uidb64>/<token>/', PasswordTokenCheckAPI.as_view(), name='reset_password_confirm'),

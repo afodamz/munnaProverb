@@ -1,10 +1,8 @@
-from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from .models import *
-from rest_auth.registration.views import RegisterView, LoginView
 from rest_framework.views import APIView
 from .serializers import *
 from rest_framework.response import Response
@@ -19,6 +17,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 
 
+from django.contrib.auth import login as django_login, logout as django_logout
+from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
+
 # Create your views here.
 class CustomRegisterView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
@@ -27,6 +29,50 @@ class CustomRegisterView(generics.ListAPIView):
 
     # def get_queryset(self):
     #     return User.objects.all()
+
+
+class Registration(APIView):
+    def post(self, request):
+        serializer = MyRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            self.object.set_password(serializer.data.get("password"))
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterView(generics.GenericAPIView):
+
+    serializer_class = RegisterSerializer
+
+    def post(self, request):
+        user = request.data
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        user = CustomUser.objects.get(email=serializer.data['email'])
+        token = Token.objects.create(user=user)
+
+        return Response({"token": token.key}, status=status.HTTP_201_CREATED)
+
+
+
+
+class LoginView(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        django_login(request, user)
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key}, status=status.HTTP_200_OK)
+
+class LogoutView(APIView):
+    authentication_classes = (TokenAuthentication, )
+
+    def post(self, request):
+        django_logout(request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ChangePasswordView(UpdateAPIView):
@@ -86,7 +132,6 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
             Util.send_email(data)
 
         return Response({'success':"We have sent you a link to reset your password"}, status=status.HTTP_200_OK)
-
 
 
 class PasswordTokenCheckAPI(generics.GenericAPIView):

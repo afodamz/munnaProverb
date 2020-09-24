@@ -25,7 +25,6 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 REST_AUTH_SERIALIZERS = {
     "USER_DETAILS_SERIALIZER": "Accounts.serializers.CustomUserDetailsSerializer",
@@ -35,13 +34,10 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "Accounts.serializers.MyRegisterSerializer",
 }
 
-REST_FRAMEWORK = {
-   'DEFAULT_PERMISSION_CLASSES': ( 'rest_framework.permissions.IsAdminUser', ),
-}
-
 
 SITE_ID = 2
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 
 
 AUTHENTICATION_BACKENDS = [
@@ -52,13 +48,13 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+# AUTHENTICATION_BACKENDS = ('Accounts.backends.CustomUserAuth', )
+
 # EMAIL CONFIGURATION
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'damilolatestsmtp@gmail.com'
 EMAIL_HOST_PASSWORD = 'uczfdmwvjrtxnzbd'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
 EMAIL_USE_SSL = True
 EMAIL_PORT = 465
 
@@ -82,8 +78,6 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'django_rest_passwordreset',
-
 
     'Proverbs',
     'Accounts',
@@ -157,7 +151,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 

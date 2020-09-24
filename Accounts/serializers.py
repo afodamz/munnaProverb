@@ -20,7 +20,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
-class MyRegisterSerializer(RegisterSerializer):
+class MyRegisterSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=True, write_only=True)
     last_name = serializers.CharField(required=True, write_only=True)
 
@@ -32,7 +32,7 @@ class MyRegisterSerializer(RegisterSerializer):
             'email': self.validated_data.get('email', ''),
         }
 
-    def save(self, request):
+    def save(self):
         adapter = get_adapter()
         user = adapter.new_user(request)
         self.cleaned_data = self.get_cleaned_data()
@@ -40,6 +40,64 @@ class MyRegisterSerializer(RegisterSerializer):
         setup_user_email(request, user, [])
         user.save()
         return user
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+
+    # password1 = serializers.CharField(min_length=settings.MIN_PASSWORD_LENGTH, error_messages={
+    #     'min_length': "Password must be longer than {} characters".format(settings.MIN_PASSWORD_LENGTH)})
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'first_name', 'last_name', 'password', 'password2']
+        extra_kwargs = {"password": {"write_only": True}}
+
+    def save(self):
+        account = CustomUser(
+            email = self.validated_data['email'],
+            first_name = self.validated_data['first_name'],
+            last_name = self.validated_data['last_name']
+        )
+        password = self.validated_data['password']
+        password2 = self.validated_data['password2']
+
+        if password != password2:
+            raise serializers.ValidationError({'password': 'Passwords must match'})
+        account.set_password(password)
+        account.save()
+        return account
+
+
+
+
+from django.contrib.auth import authenticate
+from rest_framework import exceptions
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        email = data.get('email', '')
+        password = data.get('password', '')
+
+        if email and password:
+            user = authenticate(email=email, password=password)
+            if user:
+                if user.is_active:
+                    data['user'] = user
+                else:
+                    msg = "User is deactivated"
+                    raise exceptions.ValidationError(msg)
+            else:
+                msg = "unable to login with given credentials"
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = "unable to login with given credentials"
+            raise exceptions.ValidationError(msg)
+
+        return data
+
+
 
 
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
