@@ -6,9 +6,12 @@ from django.utils import timezone
 # Create your models here.
 class Proverb(models.Model):
     PROVERB_OPTIONS = [
-        ('SALARY', 'SALARY'),
-        ('BUSINESS', 'BUSINESS'),
-        ('SIDE-HUSTLES', 'SIDE-HUSTLES'),
+        ('SYNONYMOUS', 'SYNONYMOUS'),
+        ('ANTITHETICAL', 'ANTITHETICAL'),
+        ('SYNTHETIC', 'SYNTHETIC'),
+        ('INTEGRAL', 'INTEGRAL'),
+        ('PARABOLIC', 'PARABOLIC'),
+        ('COMPARATIVE', 'COMPARATIVE'),
         ('OTHERS', 'OTHERS')
     ]
 
